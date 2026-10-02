@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>점심 커피 쏘기</title>
+<style>
+:root{
+  --purple:#7c3aed;
+  --purple2:#8b5cf6;
+  --purple3:#ede9fe;
+  --purple4:#f5f3ff;
+  --ink:#20162f;
+  --muted:#665c73;
+  --line:#e7e2ef;
+  --card:#ffffff;
+  --danger:#dc2626;
+  --shadow:0 12px 34px rgba(76,29,149,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 15% 0%, #efe7ff 0, transparent 30rem),
+    linear-gradient(180deg,#fff,#f8f5ff 70%,#f5f3ff);
+}
+.container{width:min(1120px,calc(100% - 28px));margin:0 auto;padding:30px 0 50px}
+.hero{
+  display:flex;justify-content:space-between;gap:20px;align-items:flex-end;
+  margin-bottom:22px
+}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--purple3);color:#5b21b6;
+  padding:7px 11px;border-radius:999px;font-weight:900;font-size:13px;
+  margin-bottom:10px
+}
+h1{margin:0;font-size:clamp(32px,5vw,52px);line-height:1.02;letter-spacing:-1.5px}
+.hero p{margin:10px 0 0;color:var(--muted);font-size:16px;font-weight:600}
+.hero-card{
+  background:white;border:1px solid #ddd6fe;border-radius:18px;
+  padding:14px 16px;box-shadow:var(--shadow);min-width:180px
+}
+.hero-card b{display:block;color:#5b21b6;font-size:20px}
+.hero-card span{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;align-items:start}
+.panel{
+  background:rgba(255,255,255,.96);
+  border:1px solid #ddd6fe;border-radius:24px;padding:20px;
+  box-shadow:var(--shadow)
+}
+.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px}
+.panel h2{font-size:19px;margin:0}
+.count{
+  font-size:12px;color:var(--muted);background:#fafafa;border:1px solid var(--line);
+  padding:6px 9px;border-radius:999px
+}
+.input-wrap{display:flex;gap:10px;margin-bottom:12px}
+.input-wrap input{
+  flex:1;border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+  font-size:16px;font-weight:700;outline:none
+}
+.input-wrap input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+button{
+  border:0;border-radius:14px;padding:12px 16px;font-size:14px;font-weight:900;
+  cursor:pointer;transition:.18s ease
+}
+button:active{transform:scale(.98)}
+.primary{
+  color:white;background:linear-gradient(135deg,var(--purple),#5b21b6);
+  box-shadow:0 8px 18px rgba(91,33,182,.22)
+}
+.primary:hover{transform:translateY(-1px);filter:brightness(1.04)}
+.secondary{background:var(--purple4);color:#5b21b6;border:1px solid #ddd6fe}
+.secondary:hover{background:var(--purple3)}
+.danger{background:#fff1f2;color:#be123c;border:1px solid #fecdd3}
+.people{display:grid;gap:9px;max-height:400px;overflow:auto;padding-right:3px}
+.person{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:1px solid var(--line);border-radius:14px;padding:11px 12px;background:white
+}
+.person-left{display:flex;align-items:center;gap:10px;min-width:0}
+.avatar{
+  width:34px;height:34px;border-radius:11px;background:var(--purple3);
+  color:#5b21b6;display:grid;place-items:center;font-weight:1000;flex:none
+}
+.name{font-size:15px;font-weight:900;white-space:normal;word-break:break-word}
+.remove{
+  width:32px;height:32px;padding:0;border-radius:10px;background:#fafafa;color:#7c3aed;
+  border:1px solid var(--line);flex:none
+}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.actions button{flex:1}
+.stage{text-align:center}
+.machine{
+  position:relative;
+  min-height:360px;border-radius:22px;
+  background:linear-gradient(180deg,#faf7ff,#f2ebff);
+  border:1px dashed #c4b5fd;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;overflow:hidden
+}
+.cup{
+  width:150px;height:120px;border-radius:18px 18px 36px 36px;
+  background:linear-gradient(180deg,#fff,#ede9fe);
+  border:7px solid #7c3aed;
+  position:relative;box-shadow:0 14px 28px rgba(76,29,149,.12)
+}
+.cup:after{
+  content:"";position:absolute;right:-54px;top:20px;width:56px;height:58px;
+  border:10px solid #7c3aed;border-left:0;border-radius:0 36px 36px 0
+}
+.coffee{
+  position:absolute;left:12px;right:12px;top:8px;height:25px;
+  background:#6f4e37;border-radius:50%
+}
+.steam{
+  position:absolute;top:-44px;width:12px;height:44px;border-radius:999px;
+  background:linear-gradient(180deg,transparent,rgba(124,58,237,.28));
+  animation:steam 2s ease-in-out infinite
+}
+.steam.s1{left:38px}.steam.s2{left:68px;animation-delay:.5s}.steam.s3{left:96px;animation-delay:1s}
+@keyframes steam{0%{transform:translateY(10px) scaleX(.8);opacity:0}50%{opacity:1}100%{transform:translateY(-8px) scaleX(1.2);opacity:0}}
+.slot{
+  margin-top:24px;
+  width:min(100%,460px);min-height:74px;
+  border-radius:18px;background:white;border:2px solid #ddd6fe;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;font-size:clamp(20px,4vw,30px);font-weight:1000;color:#4c1d95;
+  box-shadow:0 8px 24px rgba(76,29,149,.08);
+  word-break:break-word
+}
+.spin-list{
+  animation:flash .15s linear infinite
+}
+@keyframes flash{50%{transform:scale(1.03);opacity:.72}}
+.winner-card{
+  display:none;
+  margin-top:16px;padding:18px;border-radius:18px;
+  background:linear-gradient(135deg,#ede9fe,#fff);
+  border:2px solid #8b5cf6
+}
+.winner-card.show{display:block;animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
+.winner-card small{display:block;color:var(--muted);font-weight:800;margin-bottom:6px}
+.winner-card strong{display:block;font-size:clamp(28px,5vw,42px);color:#5b21b6}
+.winner-card span{display:block;margin-top:8px;font-weight:800;color:#4b4256}
+.notice{
+  margin-top:14px;padding:12px 14px;border-radius:14px;
+  background:#faf7ff;border:1px dashed #c4b5fd;color:#5b5470;
+  font-size:12px;line-height:1.55;text-align:left
+}
+.footer-note{margin-top:16px;text-align:center;color:var(--muted);font-size:12px}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{
+  position:absolute;width:8px;height:14px;border-radius:2px;
+  animation:fall 1.8s ease-in forwards
+}
+@keyframes fall{
+  from{transform:translateY(-30px) rotate(0);opacity:1}
+  to{transform:translateY(420px) rotate(540deg);opacity:0}
+}
+@media(max-width:860px){
+  .grid{grid-template-columns:1fr}
+  .hero{flex-direction:column;align-items:flex-start}
+  .hero-card{width:100%}
+}
+@media(max-width:560px){
+  .container{width:min(100% - 18px,1120px);padding-top:20px}
+  .panel{padding:14px;border-radius:20px}
+  .input-wrap{flex-direction:column}
+  .input-wrap button{width:100%}
+  .actions{flex-direction:column}
+  .machine{min-height:330px;padding:18px}
+  .cup{transform:scale(.9)}
+}
+</style>
+</head>
+<body>
+<main class="container">
+  <section class="hero">
+    <div>
+      <div class="badge">☕ LUNCH COFFEE PICKER</div>
+      <h1>점심 커피 쏘기</h1>
+      <p>참여자를 넣고 버튼 한 번! 오늘 커피를 쏠 사람을 재미있게 뽑아보세요.</p>
+    </div>
+    <div class="hero-card">
+      <b>랜덤 추첨</b>
+      <span>누가 걸릴지는 아무도 모릅니다 🎲</span>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>참여자 입력</h2>
+        <span class="count" id="count">0명</span>
+      </div>
+
+      <div class="input-wrap">
+        <input id="nameInput" type="text" maxlength="20" placeholder="이름을 입력하세요" />
+        <button class="primary" id="addBtn">추가</button>
+      </div>
+
+      <div class="people" id="people"></div>
+
+      <div class="actions">
+        <button class="secondary" id="sampleBtn">예시 넣기</button>
+        <button class="danger" id="clearBtn">전체 삭제</button>
+      </div>
+    </div>
+
+    <div class="panel stage">
+      <div class="panel-head">
+        <h2>오늘의 커피 당번 뽑기</h2>
+        <span class="count">인터랙티브 추첨</span>
+      </div>
+
+      <div class="machine" id="machine">
+        <div class="confetti" id="confetti"></div>
+        <div class="cup">
+          <div class="coffee"></div>
+          <div class="steam s1"></div>
+          <div class="steam s2"></div>
+          <div class="steam s3"></div>
+        </div>
+
+        <div class="slot" id="slot">참여자를 추가해주세요 ☕</div>
+
+        <div class="actions" style="width:min(100%,460px)">
+          <button class="primary" id="drawBtn">🎯 커피 쏠 사람 뽑기</button>
+          <button class="secondary" id="resetBtn">다시 준비</button>
+        </div>
+
+        <div class="winner-card" id="winnerCard">
+          <small>오늘 커피를 쏠 사람은</small>
+          <strong id="winnerName">-</strong>
+          <span>맛있는 커피 부탁드립니다 ☕✨</span>
+        </div>
+      </div>
+
+      <div class="notice">
+        ※ 이 프로그램은 재미를 위한 무작위 추첨입니다. 실제 비용 부담이나 팀 내 규칙은 참여자 간 합의에 따라 정해주세요.
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">점심시간의 소소한 재미를 위한 랜덤 커피 추첨기</div>
+</main>
+
+<script>
+const people = [];
+const nameInput = document.getElementById("nameInput");
+const peopleBox = document.getElementById("people");
+const count = document.getElementById("count");
+const slot = document.getElementById("slot");
+const winnerCard = document.getElementById("winnerCard");
+const winnerName = document.getElementById("winnerName");
+const drawBtn = document.getElementById("drawBtn");
+const confetti = document.getElementById("confetti");
+let drawing = false;
+
+function esc(s=""){
+  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+function render(){
+  count.textContent = people.length + "명";
+  peopleBox.innerHTML = people.length ? people.map((p,i)=>`
+    <div class="person">
+      <div class="person-left">
+        <div class="avatar">${i+1}</div>
+        <div class="name">${esc(p)}</div>
+      </div>
+      <button class="remove" aria-label="${esc(p)} 삭제" onclick="removePerson(${i})">×</button>
+    </div>
+  `).join("") : `
+    <div style="padding:28px 12px;text-align:center;color:#776f82;border:1px dashed #ddd6fe;border-radius:14px;background:#faf7ff">
+      아직 참여자가 없습니다.<br><small>이름을 추가하거나 예시를 넣어보세요.</small>
+    </div>`;
+  if(!people.length){
+    slot.textContent = "참여자를 추가해주세요 ☕";
+  }
+}
+
+window.removePerson = function(i){
+  if(drawing) return;
+  people.splice(i,1);
+  winnerCard.classList.remove("show");
+  render();
+}
+
+function addPerson(){
+  const name = nameInput.value.trim();
+  if(!name) return;
+  if(people.length >= 20){
+    alert("참여자는 최대 20명까지 추가할 수 있습니다.");
+    return;
+  }
+  people.push(name);
+  nameInput.value = "";
+  winnerCard.classList.remove("show");
+  render();
+  nameInput.focus();
+}
+
+function launchConfetti(){
+  confetti.innerHTML = "";
+  const colors = ["#7c3aed","#8b5cf6","#a78bfa","#c4b5fd","#f59e0b","#ec4899"];
+  for(let i=0;i<54;i++){
+    const el = document.createElement("i");
+    el.style.left = Math.random()*100 + "%";
+    el.style.top = (-10 - Math.random()*80) + "px";
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDelay = (Math.random()*.5) + "s";
+    el.style.animationDuration = (1.2 + Math.random()*1.3) + "s";
+    confetti.appendChild(el);
+  }
+  setTimeout(()=>confetti.innerHTML="",3000);
+}
+
+function draw(){
+  if(drawing) return;
+  if(people.length < 2){
+    alert("추첨하려면 참여자를 2명 이상 추가해주세요.");
+    return;
+  }
+  drawing = true;
+  drawBtn.disabled = true;
+  winnerCard.classList.remove("show");
+  slot.classList.add("spin-list");
+
+  let ticks = 0;
+  const total = 28;
+  const timer = setInterval(()=>{
+    slot.textContent = people[Math.floor(Math.random()*people.length)];
+    ticks++;
+    if(ticks >= total){
+      clearInterval(timer);
+      const winner = people[Math.floor(Math.random()*people.length)];
+      slot.textContent = winner + " ☕";
+      slot.classList.remove("spin-list");
+      winnerName.textContent = winner;
+      winnerCard.classList.add("show");
+      launchConfetti();
+      drawing = false;
+      drawBtn.disabled = false;
+    }
+  }, 90);
+}
+
+document.getElementById("addBtn").addEventListener("click", addPerson);
+nameInput.addEventListener("keydown", e => {
+  if(e.key === "Enter") addPerson();
+});
+document.getElementById("sampleBtn").addEventListener("click", ()=>{
+  if(drawing) return;
+  const samples = ["김민수","이지은","박현우","최서연","정도윤"];
+  samples.forEach(n => { if(!people.includes(n)) people.push(n); });
+  winnerCard.classList.remove("show");
+  render();
+});
+document.getElementById("clearBtn").addEventListener("click", ()=>{
+  if(drawing) return;
+  people.splice(0,people.length);
+  winnerCard.classList.remove("show");
+  render();
+});
+drawBtn.addEventListener("click", draw);
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(drawing) return;
+  winnerCard.classList.remove("show");
+  slot.textContent = people.length ? "준비 완료! 버튼을 눌러주세요 ☕" : "참여자를 추가해주세요 ☕";
+});
+
+render();
+</script>
+</body>
+</html>
